@@ -1,70 +1,258 @@
-# Getting Started with Create React App
+# React + Redux + Saga 
+https://www.youtube.com/watch?v=G3GGXIhggGs  
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### npx create-react-app . 
 
-## Available Scripts
+в public/index.html подключаем css стили https://www.getbootstrap.com 
 
-In the project directory, you can run:
+классы нужны, когда нам нужны особые хуки жизненного цикла 
 
-### `yarn start`
+абсолютно универсальный способ ОБРАБОТКИ ИНПУТОВ 
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  changeInputHandler = event => {
+        this.setState(prev => ({...prev, ...{
+            [event.target.name]: event.target.value 
+        }}))
+    }
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
 
-### `yarn test`
+контекст и useReducer не убивают redux 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+потому, что redux - это большая инфраструктура, где есть  множество 
+Redux - это парадигма. отделяющая данные от слоя представления 
 
-### `yarn build`
+контекст выполняет ту же самую роль. НО ТАМ НЕТ ПРИВЯЗКИ К СТАНДАРТНОМУ ПОВЕДЕНИЮ РЕДАКСА,  
+во FLUX множество стейтов 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Context существует только в рамках Реакта для того, чтобы передавать свойства 
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### УСТАНОВКА РЕДАКСА
 
-### `yarn eject`
+### npm install redux react-redux
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+сам по себе редакс не привязан к реакту 
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### ПОДКЛЮЧЕНИЕ REDUX к проекту 
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+переходим в файл index.js 
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+// создаем store 
+const store = createStore(rootReducer);
 
-## Learn More
+первым параметром принимаем rootReducer 
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+redux -> rootReducer.js 
+import {combineReducers} from 'redux';
+import { postsReducer } from './postsReducer';
 
-### Code Splitting
+export const rootReducer = combineReducers({
+    posts: postsReducer
+})
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+редюсеры - это чистые функции
 
-### Analyzing the Bundle Size
+postsReducer.js 
+const initialState = {
+    posts: [],
+    fetchedPosts: []
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+export const postsReducer = (state = initialState, action) => {
+return state;
+}
 
-### Making a Progressive Web App
+import {Provider] from 'react-redux' 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Provider - ЭТО КОМПОНЕНТ ВЫСШЕГО ПОРЯДКА, который не создает свой шаблон и в который мы оборачиваем наще приложение 
 
-### Advanced Configuration
+// создаем store 
+const store = createStore(rootReducer);
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+const app = (
+  <Provider store={store}>
+<App />
+  </Provider>
+)
 
-### Deployment
+ReactDOM.render(app, document.getElementById('root')); 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### `yarn build` fails to minify
+### ПОДКЛЮЧАЕМ DEVTOOLS 
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+гуглим redux devtools extension 
+
+переходим на гитхаб:
+https://github.com/zalmoxisus/redux-devtools-extension 
+
+теперь код выглядит так: 
+// создаем store 
+const store = createStore(rootReducer, compose(
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+)); 
+
+
+
+### ФУНКЦИОНАЛ ДОБАВЛЕНИЯ АСИНХРОННОГО ПОСТА 
+
+ГЛУПЫЙ КОМПОНЕНТ - работает только с шаблоном и только с входящими данными 
+
+УМНЫЙ КОМПОНЕНТ УМЕЕТ ПОЛУЧАТЬ ДАННЫЕ ИЗ СТОРА 
+
+функция connect - она дополняет компонент новым функционалом 
+
+export default connect()(Posts);  
+
+mapStateToProps преобразовывает стейт в пропсы 
+const mapStateToProps = state => ({
+    
+}) 
+
+ДИСПАТЧИТЬ НОВОЕ СОБЫТИЕ 
+
+redux -> types.js 
+там переменные 
+
+после этого создаем switch case в posts reducer 
+ switch(action.type) {
+
+        case CREATE_POST:
+        //    return {...state, posts: state.posts.concat(action.payload)}
+        return { ...state, posts: [...state.posts, action.payload] } // новый синтаксис
+        default: return state;
+    }
+
+
+а потом action creator 
+
+redux -> actions.ts 
+import { CREATE_POST } from "./types";
+
+export function createPost(post) {
+    return {
+    type: CREATE_POST,
+    payload: post 
+}
+}
+
+
+ТЕПЕРЬ НУЖНО ЭКШЕН ОТДИСПАТЧИТЬ 
+
+в классе PostForm 
+export default connect()(PostForm) 
+
+
+mapDispatchToProps 
+
+туда передаются экшены для диспатча 
+
+const mapDispatchToProps = {
+    createPost
+} 
+
+
+
+export default connect(null, mapDispatchToProps)(PostForm)
+
+
+### РАБОТА С АСИНХРОННОСТЬЮ 
+для того, чтобы работать с асинхронностью, нужен дополнительный пакет
+устанавливаем redux thunk 
+
+### npm install redux-thunk 
+
+redux thunk является middleware для стора 
+
+добавляем thunk в приложение
+файл index.js 
+
+// создаем store 
+const store = createStore(rootReducer, compose(
+  applyMiddleware(thunk),
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+));
+
+
+thunk дает возможность диспатчить асинхронные события 
+
+
+Pure functions - это такие функции, которые работают независимо ни от чего 
+
+они работаюто только через входные параметры, при этом не основываются ни на каких глобальных объектах 
+вся логика завязана только внутри них 
+  и такие функции можно переиспользовать 
+
+
+сервис Jsonplaceholder 
+
+https://jsonplaceholder.typicode.com/ 
+
+для того, чтобы диспатчить экшены в стор 
+const dispatch = useDispatch() 
+
+<button className="btn btn-primary"
+        onClick={dispatch(fetchPosts)}
+        >Загрузить</button>
+
+пищем, что нам нужно достать их стора
+с помощью useSelector 
+const posts = useSelector(state => state.posts.fetchedPosts)
+
+ 
+### MIDDLEWARE 
+
+redux -> middleware.js 
+import { CREATE_POST } from './types';
+import { showAlert } from './actions';
+
+const forbidden = ['fuck', 'spam', 'php'];
+
+export function forbiddenWordsMiddleware({ dispatch }) {
+    return function(next) {
+        return function(action) {
+            if (action.type === CREATE_POST) {
+                const found = forbidden.filter(w => action.payload.title.includes(w));
+                if (found.length) {
+                    return dispatch(showAlert('Не нужно спамить!!!'))
+                }
+            } 
+            return next(action)
+        }
+    }
+} 
+
+добавляем миддлвайр в index.js 
+applyMiddleware(thunk, forbiddenWordsMiddleware) 
+
+
+### REDUX SAGA 
+
+саги - это то, что позволяет работать с сайд эффектами в редаксе 
+
+### УСТАНАВЛИВАЕМ САГУ 
+### npm install redux-saga 
+
+НАСТРОЙКА SAGA 
+
+саги хранятся в redux -> sagas.js 
+
+export function* sagaWatcher() {
+
+}
+
+в файле index.js 
+import createSagaMiddleware from 'redux-saga' 
+
+// создаем сагу
+const saga = createSagaMiddleware()
+
+applyMiddleware(thunk, forbiddenWordsMiddleware, saga),
+
+// привязываем вотчер к саге
+saga.run(sagaWatcher)
+
+https://redux-saga.js.org/
+
+ДАЛЕЕ РАБОТАЕТ ВНУТРИ САГ 
+ДОБАВЛЯЕМ САЙД ЭФФЕКТ 
